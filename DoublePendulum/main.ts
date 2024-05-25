@@ -118,7 +118,7 @@ const init = (): void => {
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     console.log('Done. Init complete');
-    let doublePendulum = new DoublePendulum(angleToRadians(80), 0,angleToRadians(120), 0, 1, 1, 1, 1, 9.81, canvas, ctx);
+    let doublePendulum = new DoublePendulum(angleToRadians(60),angleToRadians(120), 0, 0, 1, 1, 1, 1, 9.81, canvas, ctx);
     setInterval(()=> {main(doublePendulum)}, 10);
 
 

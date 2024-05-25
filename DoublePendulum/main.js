@@ -83,7 +83,7 @@ var init = function () {
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     console.log('Done. Init complete');
-    var doublePendulum = new DoublePendulum(angleToRadians(80), 0, angleToRadians(120), 0, 1, 1, 1, 1, 9.81, canvas, ctx);
+    var doublePendulum = new DoublePendulum(angleToRadians(80), angleToRadians(120), 0, 0, 1, 1, 1.5, 1, 9.81, canvas, ctx);
     setInterval(function () { main(doublePendulum); }, 10);
 };
 var main = function (doublePendulum) {
