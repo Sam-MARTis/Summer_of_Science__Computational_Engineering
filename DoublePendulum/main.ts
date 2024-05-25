@@ -1,4 +1,20 @@
 
+// var ctx: object;
+// var canvas: any;
+// interface canvasObject{
+//     width: number;
+//     height: number;
+// }
+const TIME_STEP = 0.01;
+interface ctxObject{
+    clearRect: (x: number, y: number, width: number, height: number) => void;
+    beginPath: () => void;
+    moveTo: (x: number, y: number) => void;
+    lineTo: (x: number, y: number) => void;
+    stroke: () => void;
+    strokeStyle: string;
+}
+
 class DoublePendulum{
     theta1: number;
     theta2: number;
@@ -11,7 +27,10 @@ class DoublePendulum{
     gravity: number;
     alpha1: number;
     alpha2: number;
-    constructor(theta1: number, theta2: number, omega1: number, omega2: number, mass1: number, mass2: number, length1: number, length2: number, gravity: number = 9.81){
+    canvas: any
+    ctx: ctxObject;
+    meterToPixel: number = 100;
+    constructor(theta1: number, theta2: number, omega1: number, omega2: number, mass1: number, mass2: number, length1: number, length2: number, gravity: number = 9.81, canvas: any, ctx: ctxObject, meterToPixel: number = 100){
         console.log("Double Pendulum created");
         this.theta1 = theta1;
         this.theta2 = theta2;
@@ -24,6 +43,10 @@ class DoublePendulum{
         this.gravity = gravity;
         this.alpha1 = this.getAlpha1(this.theta1, this.omega1, this.theta2, this.omega2);
         this.alpha2 = this.getAlpha2(this.theta1, this.omega1, this.theta2, this.omega2);
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.meterToPixel = meterToPixel;
+        this.ctx.strokeStyle = "white";
 
     }
 
@@ -44,12 +67,7 @@ class DoublePendulum{
         this.theta1 += this.omega1*dt;
         this.theta2 += this.omega2*dt;
     }
-    // step = (dt: number): void => {
-    //     this.incrementOmega1(dt);
-    //     this.incrementTheta1(dt);
-    //     this.alpha1 = this.getAlpha1();
-    //     this.alpha2 = this.getAlpha2();
-    // }
+
     rungeKutta = (dt: number): void => {
         let k1: number = this.getAlpha1(this.theta1, this.omega1, this.theta2, this.omega2) * dt;
         let l1: number = this.getAlpha2(this.theta1, this.omega1, this.theta2, this.omega2) * dt;
@@ -64,19 +82,57 @@ class DoublePendulum{
         this.theta2 += this.omega2*dt*0.5;
         
     }
-    getDisplayInformation = (): number[] => {
-        return [this.theta1, this.theta2, this.length1, this.length2];
+    displayPendulum = (): void => {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let y1: number = this.meterToPixel* this.length1*Math.cos(this.theta1);
+        let x1: number = this.meterToPixel* this.length1*Math.sin(this.theta1);
+        let x2: number = x1 + this.meterToPixel*this.length2*Math.sin(this.theta2);
+        let y2: number = y1 + this.meterToPixel*this.length2*Math.cos(this.theta2);
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.canvas.width/2, this.canvas.height/2);
+        this.ctx.lineTo(this.canvas.width/2 + x1, this.canvas.height/2 + y1);
+        this.ctx.lineTo(this.canvas.width/2 + x2, this.canvas.height/2 + y2);
+        this.ctx.stroke();
+    
     }
 
 
+
 }
 
+// const displayPendulum = (displayInformation: number[]): void => {
 
+
+// }
+
+const angleToRadians = (angle: number): number => {
+    return angle * Math.PI/180;
+}
 
 const init = (): void => {
+    let canvas: any = document.getElementById("DoublePendulumCanvas");
+    let ctx: ctxObject = canvas.getContext("2d");
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    console.log('Done. Init complete');
+    let doublePendulum = new DoublePendulum(angleToRadians(80), 0,angleToRadians(120), 0, 1, 1, 1, 1, 9.81, canvas, ctx);
+    setInterval(()=> {main(doublePendulum)}, 10);
+
+
+
 
 }
 
-const main = (): void => {
-    
+const main = (doublePendulum: DoublePendulum): void => {
+    // console.log('loaded :>>');
+    doublePendulum.rungeKutta(TIME_STEP);
+    doublePendulum.displayPendulum();
+
+
 }
+
+
+document.addEventListener("DOMContentLoaded", init);
