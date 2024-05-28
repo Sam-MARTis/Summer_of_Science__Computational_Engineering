@@ -30,8 +30,8 @@ class DoublePendulum{
     canvas: any
     ctx: ctxObject;
     meterToPixel: number = 100;
-    constructor(theta1: number, theta2: number, omega1: number, omega2: number, mass1: number, mass2: number, length1: number, length2: number, gravity: number = 9.81, canvas: any, ctx: ctxObject, meterToPixel: number = 100){
-        console.log("Double Pendulum created");
+    constructor(theta1: number, theta2: number, omega1: number, omega2: number, mass1: number, mass2: number, length1: number, length2: number, gravity: number = 9.81, meterToPixel: number = 100, canvas: any, ctx: ctxObject){
+        // console.log("Double Pendulum created");
         this.theta1 = theta1;
         this.theta2 = theta2;
         this.omega1 = omega1;
@@ -83,18 +83,22 @@ class DoublePendulum{
         
     }
     displayPendulum = (): void => {
+        // console.log("Drawing self - Pendulum")
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         let y1: number = this.meterToPixel* this.length1*Math.cos(this.theta1);
         let x1: number = this.meterToPixel* this.length1*Math.sin(this.theta1);
         let x2: number = x1 + this.meterToPixel*this.length2*Math.sin(this.theta2);
         let y2: number = y1 + this.meterToPixel*this.length2*Math.cos(this.theta2);
-
         this.ctx.beginPath();
+        
         this.ctx.moveTo(this.canvas.width/2, this.canvas.height/2);
         this.ctx.lineTo(this.canvas.width/2 + x1, this.canvas.height/2 + y1);
         this.ctx.lineTo(this.canvas.width/2 + x2, this.canvas.height/2 + y2);
         this.ctx.stroke();
     
+    }
+    getAllResizeValues = (): number[] => {
+        return [this.theta1, this.theta2, this.omega1, this.omega2, this.mass1, this.mass2, this.length1, this.length2, this.gravity,  this.meterToPixel]
     }
 
 
@@ -109,25 +113,37 @@ class DoublePendulum{
 const angleToRadians = (angle: number): number => {
     return angle * Math.PI/180;
 }
+const resizeHandle = (canvas: any): void => {
+    // console.log('Resizing');
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    doublePendulum = new DoublePendulum(...doublePendulum.getAllResizeValues(), canvas,ctx )
+    // console.log(new DoublePendulum(...doublePendulum.getAllResizeValues(), canvas, ctx))
+
+}
+
+let canvas: any
+let ctx: ctxObject
+let doublePendulum: DoublePendulum
 
 const init = (): void => {
-    let canvas: any = document.getElementById("DoublePendulumCanvas");
-    let ctx: ctxObject = canvas.getContext("2d");
+    canvas= document.getElementById("DoublePendulumCanvas");
+    ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth * devicePixelRatio;
     canvas.height = window.innerHeight * devicePixelRatio;
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     console.log('Done. Init complete');
-    let doublePendulum = new DoublePendulum(angleToRadians(60),angleToRadians(120), 0, 0, 1, 1, 1, 1, 9.81, canvas, ctx);
+    doublePendulum = new DoublePendulum(angleToRadians(60),angleToRadians(120), 0, 0, 1, 1, 1, 1, 9.81,100, canvas, ctx);
     setInterval(()=> {main(doublePendulum)}, 10);
-
-
-
-
+    window.addEventListener('resize', () => {resizeHandle(canvas)})
+    
 }
 
 const main = (doublePendulum: DoublePendulum): void => {
-    // console.log('loaded :>>');
+    
     doublePendulum.rungeKutta(TIME_STEP);
     doublePendulum.displayPendulum();
 
@@ -135,4 +151,10 @@ const main = (doublePendulum: DoublePendulum): void => {
 }
 
 
-document.addEventListener("DOMContentLoaded", init);
+
+
+
+
+
+
+window.addEventListener("DOMContentLoaded", init);

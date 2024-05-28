@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 // var ctx: object;
 // var canvas: any;
 // interface canvasObject{
@@ -6,7 +15,7 @@
 // }
 var TIME_STEP = 0.01;
 var DoublePendulum = /** @class */ (function () {
-    function DoublePendulum(theta1, theta2, omega1, omega2, mass1, mass2, length1, length2, gravity, canvas, ctx, meterToPixel) {
+    function DoublePendulum(theta1, theta2, omega1, omega2, mass1, mass2, length1, length2, gravity, meterToPixel, canvas, ctx) {
         if (gravity === void 0) { gravity = 9.81; }
         if (meterToPixel === void 0) { meterToPixel = 100; }
         var _this = this;
@@ -40,6 +49,7 @@ var DoublePendulum = /** @class */ (function () {
             _this.theta2 += _this.omega2 * dt * 0.5;
         };
         this.displayPendulum = function () {
+            // console.log("Drawing self - Pendulum")
             _this.ctx.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
             var y1 = _this.meterToPixel * _this.length1 * Math.cos(_this.theta1);
             var x1 = _this.meterToPixel * _this.length1 * Math.sin(_this.theta1);
@@ -51,7 +61,10 @@ var DoublePendulum = /** @class */ (function () {
             _this.ctx.lineTo(_this.canvas.width / 2 + x2, _this.canvas.height / 2 + y2);
             _this.ctx.stroke();
         };
-        console.log("Double Pendulum created");
+        this.getAllResizeValues = function () {
+            return [_this.theta1, _this.theta2, _this.omega1, _this.omega2, _this.mass1, _this.mass2, _this.length1, _this.length2, _this.gravity, _this.meterToPixel];
+        };
+        // console.log("Double Pendulum created");
         this.theta1 = theta1;
         this.theta2 = theta2;
         this.omega1 = omega1;
@@ -75,20 +88,32 @@ var DoublePendulum = /** @class */ (function () {
 var angleToRadians = function (angle) {
     return angle * Math.PI / 180;
 };
+var resizeHandle = function (canvas) {
+    // console.log('Resizing');
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    doublePendulum = new (DoublePendulum.bind.apply(DoublePendulum, __spreadArray(__spreadArray([void 0], doublePendulum.getAllResizeValues(), false), [canvas, ctx], false)))();
+    // console.log(new DoublePendulum(...doublePendulum.getAllResizeValues(), canvas, ctx))
+};
+var canvas;
+var ctx;
+var doublePendulum;
 var init = function () {
-    var canvas = document.getElementById("DoublePendulumCanvas");
-    var ctx = canvas.getContext("2d");
+    canvas = document.getElementById("DoublePendulumCanvas");
+    ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth * devicePixelRatio;
     canvas.height = window.innerHeight * devicePixelRatio;
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     console.log('Done. Init complete');
-    var doublePendulum = new DoublePendulum(angleToRadians(80), angleToRadians(120), 0, 0, 1, 1, 1.5, 1, 9.81, canvas, ctx);
+    doublePendulum = new DoublePendulum(angleToRadians(60), angleToRadians(120), 0, 0, 1, 1, 1, 1, 9.81, 100, canvas, ctx);
     setInterval(function () { main(doublePendulum); }, 10);
+    window.addEventListener('resize', function () { resizeHandle(canvas); });
 };
 var main = function (doublePendulum) {
-    // console.log('loaded :>>');
     doublePendulum.rungeKutta(TIME_STEP);
     doublePendulum.displayPendulum();
 };
-document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("DOMContentLoaded", init);
