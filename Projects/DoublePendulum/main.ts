@@ -167,23 +167,23 @@ class DoublePendulum {
       this.getAlpha2(this.theta1, this.omega1, this.theta2, this.omega2) * dt;
     let k2: number =
       this.getAlpha1(
-        this.theta1 + 0.5 * this.omega1 * dt,
-        this.omega1 + 0.5 * k1,
-        this.theta2 + 0.5 * this.omega2 * dt,
-        this.omega2 + 0.5 * l1
+        this.theta1 + this.omega1 * dt,
+        this.omega1 + k1,
+        this.theta2 + this.omega2 * dt,
+        this.omega2 + l1
       ) * dt;
     let l2: number =
       this.getAlpha2(
-        this.theta1 + 0.5 * this.omega1 * dt,
-        this.omega1 + 0.5 * k1,
-        this.theta2 + 0.5 * this.omega2 * dt,
-        this.omega2 + 0.5 * l1
+        this.theta1 + this.omega1 * dt,
+        this.omega1 + k1,
+        this.theta2 + this.omega2 * dt,
+        this.omega2 + l1
       ) * dt;
 
     this.theta1 += this.omega1 * dt * 0.5;
     this.theta2 += this.omega2 * dt * 0.5;
-    this.omega1 += k2;
-    this.omega2 += l2;
+    this.omega1 += (k1+k2)/2;
+    this.omega2 += (l1+l2)/2;
     this.theta1 += this.omega1 * dt * 0.5;
     this.theta2 += this.omega2 * dt * 0.5;
   };
@@ -221,7 +221,7 @@ class DoublePendulum {
       this.canvas.height / 2 + y2
     );
     let vel = Math.exp(-Math.sqrt((this.previousX-x2)**2 + (this.previousY-y2)**2)/(TIME_STEP*VELOCITY_SCALE))
-    this.pathCtx.strokeStyle = `rgb(${255*vel},0, ${255*(1-vel)})`
+    this.pathCtx.strokeStyle = `rgb(${255*(1-vel)},0, ${255*(vel)})`
     this.pathCtx.stroke();
     console.log(255*vel)
 

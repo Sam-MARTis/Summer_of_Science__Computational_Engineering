@@ -69,12 +69,12 @@ var DoublePendulum = /** @class */ (function () {
         this.rungeKutta = function (dt) {
             var k1 = _this.getAlpha1(_this.theta1, _this.omega1, _this.theta2, _this.omega2) * dt;
             var l1 = _this.getAlpha2(_this.theta1, _this.omega1, _this.theta2, _this.omega2) * dt;
-            var k2 = _this.getAlpha1(_this.theta1 + 0.5 * _this.omega1 * dt, _this.omega1 + 0.5 * k1, _this.theta2 + 0.5 * _this.omega2 * dt, _this.omega2 + 0.5 * l1) * dt;
-            var l2 = _this.getAlpha2(_this.theta1 + 0.5 * _this.omega1 * dt, _this.omega1 + 0.5 * k1, _this.theta2 + 0.5 * _this.omega2 * dt, _this.omega2 + 0.5 * l1) * dt;
+            var k2 = _this.getAlpha1(_this.theta1 + _this.omega1 * dt, _this.omega1 + k1, _this.theta2 + _this.omega2 * dt, _this.omega2 + l1) * dt;
+            var l2 = _this.getAlpha2(_this.theta1 + _this.omega1 * dt, _this.omega1 + k1, _this.theta2 + _this.omega2 * dt, _this.omega2 + l1) * dt;
             _this.theta1 += _this.omega1 * dt * 0.5;
             _this.theta2 += _this.omega2 * dt * 0.5;
-            _this.omega1 += k2;
-            _this.omega2 += l2;
+            _this.omega1 += (k1 + k2) / 2;
+            _this.omega2 += (l1 + l2) / 2;
             _this.theta1 += _this.omega1 * dt * 0.5;
             _this.theta2 += _this.omega2 * dt * 0.5;
         };
@@ -101,7 +101,7 @@ var DoublePendulum = /** @class */ (function () {
             _this.ctx.lineTo(_this.canvas.width / 2 + x2, _this.canvas.height / 2 + y2);
             _this.pathCtx.lineTo(_this.canvas.width / 2 + x2, _this.canvas.height / 2 + y2);
             var vel = Math.exp(-Math.sqrt(Math.pow((_this.previousX - x2), 2) + Math.pow((_this.previousY - y2), 2)) / (TIME_STEP * VELOCITY_SCALE));
-            _this.pathCtx.strokeStyle = "rgb(".concat(255 * vel, ",0, ").concat(255 * (1 - vel), ")");
+            _this.pathCtx.strokeStyle = "rgb(".concat(255 * (1 - vel), ",0, ").concat(255 * (vel), ")");
             _this.pathCtx.stroke();
             console.log(255 * vel);
             _this.ctx.stroke();
