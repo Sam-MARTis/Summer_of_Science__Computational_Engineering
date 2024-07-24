@@ -5,23 +5,20 @@
 //     height: number;
 // }
 
-
 const TIME_STEP = 0.05;
 
 const VELOCITY_SCALE = 5e2;
-
-
 
 let canvas: any;
 let pathCanvas: any;
 let ctx: ctxObject;
 let pathCtx: ctxObject;
 let doublePendulum: DoublePendulum;
-let t1but:HTMLElement| null
-let t2but: HTMLElement| null
-let o1but :HTMLElement | null
-let o2but :HTMLElement| null
-let submitBut: HTMLElement| null
+let t1but: HTMLElement | null;
+let t2but: HTMLElement | null;
+let o1but: HTMLElement | null;
+let o2but: HTMLElement | null;
+let submitBut: HTMLElement | null;
 
 interface ctxObject {
   clearRect: (x: number, y: number, width: number, height: number) => void;
@@ -32,7 +29,6 @@ interface ctxObject {
   strokeWidth: number;
   strokeStyle: string;
   scale: (x: number, y: number) => void;
-
 }
 
 class DoublePendulum {
@@ -97,15 +93,15 @@ class DoublePendulum {
     this.meterToPixel = meterToPixel;
     this.ctx.strokeStyle = "white";
     this.pathCtx.strokeStyle = "red";
-    
+
     let y1: number = this.meterToPixel * this.length1 * Math.cos(this.theta1);
     let x1: number = this.meterToPixel * this.length1 * Math.sin(this.theta1);
     let x2: number =
       x1 + this.meterToPixel * this.length2 * Math.sin(this.theta2);
     let y2: number =
       y1 + this.meterToPixel * this.length2 * Math.cos(this.theta2);
-      this.previousX = x2;
-      this.previousY = y2;
+    this.previousX = x2;
+    this.previousY = y2;
 
     // this.pathCtx.moveTo(x2, y2);
   }
@@ -182,8 +178,8 @@ class DoublePendulum {
 
     this.theta1 += this.omega1 * dt * 0.5;
     this.theta2 += this.omega2 * dt * 0.5;
-    this.omega1 += (k1+k2)/2;
-    this.omega2 += (l1+l2)/2;
+    this.omega1 += (k1 + k2) / 2;
+    this.omega2 += (l1 + l2) / 2;
     this.theta1 += this.omega1 * dt * 0.5;
     this.theta2 += this.omega2 * dt * 0.5;
   };
@@ -211,7 +207,10 @@ class DoublePendulum {
       y1 + this.meterToPixel * this.length2 * Math.cos(this.theta2);
     this.ctx.beginPath();
     this.pathCtx.beginPath();
-    this.pathCtx.moveTo(this.canvas.width / 2 + this.previousX, this.canvas.height / 2 + this.previousY);
+    this.pathCtx.moveTo(
+      this.canvas.width / 2 + this.previousX,
+      this.canvas.height / 2 + this.previousY
+    );
 
     this.ctx.moveTo(this.canvas.width / 2, this.canvas.height / 2);
     this.ctx.lineTo(this.canvas.width / 2 + x1, this.canvas.height / 2 + y1);
@@ -220,11 +219,13 @@ class DoublePendulum {
       this.canvas.width / 2 + x2,
       this.canvas.height / 2 + y2
     );
-    let vel = Math.exp(-Math.sqrt((this.previousX-x2)**2 + (this.previousY-y2)**2)/(TIME_STEP*VELOCITY_SCALE))
-    this.pathCtx.strokeStyle = `rgb(${255*(1-vel)},0, ${255*(vel)})`
+    let vel = Math.exp(
+      -Math.sqrt((this.previousX - x2) ** 2 + (this.previousY - y2) ** 2) /
+        (TIME_STEP * VELOCITY_SCALE)
+    );
+    this.pathCtx.strokeStyle = `rgb(${255 * (1 - vel)},0, ${255 * vel})`;
     this.pathCtx.stroke();
-    console.log(255*vel)
-
+    console.log(255 * vel);
 
     this.ctx.stroke();
     this.previousX = x2;
@@ -256,11 +257,6 @@ class DoublePendulum {
 const angleToRadians = (angle: number): number => {
   return (angle * Math.PI) / 180;
 };
-
-
-
-
-
 
 const resizeHandle = (canvas: any): void => {
   // console.log('Resizing');
@@ -299,35 +295,29 @@ const newValuesHandler = (): void => {
   );
   console.log("New values set");
   resizeHandle(canvas);
-
-}
-
-
+};
 
 const init = (): void => {
   canvas = document.getElementById("DoublePendulumCanvas");
   pathCanvas = document.getElementById("DoublePendulumPathCanvas");
   ctx = canvas.getContext("2d");
   pathCtx = pathCanvas.getContext("2d");
-  pathCtx.strokeWidth = 1
-  pathCtx.scale(devicePixelRatio, devicePixelRatio)
+  pathCtx.strokeWidth = 1;
+  pathCtx.scale(devicePixelRatio, devicePixelRatio);
   canvas.width = window.innerWidth * devicePixelRatio;
   canvas.height = window.innerHeight * devicePixelRatio;
   canvas.style.width = window.innerWidth + "px";
   canvas.style.height = window.innerHeight + "px";
   pathCanvas.width = window.innerWidth * devicePixelRatio;
   pathCanvas.height = window.innerHeight * devicePixelRatio;
-  pathCanvas.style.width = window.innerWidth   + "px";
+  pathCanvas.style.width = window.innerWidth + "px";
   pathCanvas.style.height = window.innerHeight + "px";
 
-  t1but = document.getElementById("theta1")
-  t2but = document.getElementById("theta2")
-  o1but = document.getElementById("omega1")
-  o2but = document.getElementById("omega2")
-  submitBut = document.getElementById("Submit")
-
-
-
+  t1but = document.getElementById("theta1");
+  t2but = document.getElementById("theta2");
+  o1but = document.getElementById("omega1");
+  o2but = document.getElementById("omega2");
+  submitBut = document.getElementById("Submit");
 
   console.log("Done. Init complete");
   doublePendulum = new DoublePendulum(
@@ -349,8 +339,6 @@ const init = (): void => {
     main(doublePendulum);
   }, 20);
 
-
-
   window.addEventListener("resize", () => {
     resizeHandle(canvas);
   });
@@ -358,9 +346,7 @@ const init = (): void => {
     e.preventDefault();
     console.log("Submitted");
     newValuesHandler();
-  })
-
-
+  });
 };
 
 const main = (doublePendulum: DoublePendulum): void => {
