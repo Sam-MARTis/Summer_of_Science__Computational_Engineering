@@ -60,3 +60,41 @@ const prepareRHSMatrix = (mat: number[][]): number[][] => {
     }
     return result;
 }
+
+const JacobiSolver = (initialGuess: number[], mat: number[][], rhs: number[], iterations: number): number[] => {
+    if(mat.length !== mat[0].length) {
+        throw new Error("Matrix must be square");
+    }
+    if(mat.length !== rhs.length) {
+        throw new Error("Matrix and vector dimensions must match");
+    }
+    if(initialGuess.length !== rhs.length) {
+        throw new Error("Initial guess and vector dimensions must match");
+    }
+    if(iterations < 1) {
+        throw new Error("Number of iterations must be at least 1");
+    }
+
+    let state: number[] = []
+    for (let i = 0; i < initialGuess.length; i++) {
+        state.push(initialGuess[i]);
+    }
+    let rhsRev = prepareRHSVector(mat, rhs);
+    let matRev = prepareRHSMatrix(mat);
+
+    for (let i = 0; i < iterations; i++) {
+        let newState = [];
+        for (let j = 0; j < state.length; j++) {
+            newState.push(vecDotVec(matRev[j], state) + rhsRev[j]);
+        }
+        state = newState;
+    }
+    return state;
+}
+
+
+const testMat1 = [[6, 1, 2], [1, 4, 0.5], [-1, 0.5, -4]];
+const testVec1 = [-2, 1, 0];
+const testGuess1 = [0, 0, 0];
+const testIterations1 = 100;
+console.log(JacobiSolver(testGuess1, testMat1, testVec1, testIterations1));
