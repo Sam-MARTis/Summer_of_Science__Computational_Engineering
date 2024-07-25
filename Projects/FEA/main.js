@@ -84,8 +84,51 @@ const JacobiSolver = (initialGuess, mat, rhs, iterations) => {
     }
     return state;
 };
-const testMat1 = [[6, 1, 2], [1, 4, 0.5], [-1, 0.5, -4]];
-const testVec1 = [-2, 1, 0];
-const testGuess1 = [0, 0, 0];
-const testIterations1 = 100;
-console.log(JacobiSolver(testGuess1, testMat1, testVec1, testIterations1));
+class BeamElement2D {
+    constructor(length, area, stiffness) {
+        this.L = length;
+        this.A = area;
+        this.E = stiffness;
+        this.stiffnessMatrix = [
+            [(this.E * this.A) / this.L, 0, 0, (-this.E * this.A) / this.L, 0, 0],
+            [
+                0,
+                (12 * this.E * this.A) / this.L ** 3,
+                (6 * this.E * this.A) / this.L ** 2,
+                0,
+                (-12 * this.E * this.A) / this.L ** 3,
+                (6 * this.E * this.A) / this.L ** 2,
+            ],
+            [
+                0,
+                (6 * this.E * this.A) / this.L ** 2,
+                (4 * this.E * this.A) / this.L,
+                0,
+                (-6 * this.E * this.A) / this.L ** 2,
+                (2 * this.E * this.A) / this.L,
+            ],
+            [(-this.E * this.A) / this.L, 0, 0, (this.E * this.A) / this.L, 0, 0],
+            [
+                0,
+                (-12 * this.E * this.A) / this.L ** 3,
+                (-6 * this.E * this.A) / this.L ** 2,
+                0,
+                (12 * this.E * this.A) / this.L ** 3,
+                (-6 * this.E * this.A) / this.L ** 2,
+            ],
+            [
+                0,
+                (6 * this.E * this.A) / this.L ** 2,
+                (2 * this.E * this.A) / this.L,
+                0,
+                (-6 * this.E * this.A) / this.L ** 2,
+                (4 * this.E * this.A) / this.L,
+            ],
+        ];
+    }
+}
+// const testMat1 = [[6, 1, 2], [1, 4, 0.5], [-1, 0.5, -4]];
+// const testVec1 = [-2, 1, 0];
+// const testGuess1 = [0, 0, 0];
+// const testIterations1 = 100;
+// console.log(JacobiSolver(testGuess1, testMat1, testVec1, testIterations1));
