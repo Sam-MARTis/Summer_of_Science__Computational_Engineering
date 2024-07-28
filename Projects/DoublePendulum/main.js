@@ -7,7 +7,7 @@
 // }
 const TIME_STEP = 0.0001;
 const ACCURACY_MULTIPLIER = 400;
-const VELOCITY_SCALE = 5e2;
+const VELOCITY_SCALE = 650;
 let canvas;
 let pathCanvas;
 let ctx;
