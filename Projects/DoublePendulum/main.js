@@ -13,7 +13,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-var TIME_STEP = 0.05;
+var TIME_STEP = 0.0001;
+var ACCURACY_MULTIPLIER = 400;
 var VELOCITY_SCALE = 5e2;
 var canvas;
 var pathCanvas;
@@ -24,6 +25,8 @@ var t1but;
 var t2but;
 var o1but;
 var o2but;
+var l1but;
+var l2but;
 var submitBut;
 var DoublePendulum = /** @class */ (function () {
     function DoublePendulum(theta1, theta2, omega1, omega2, mass1, mass2, length1, length2, gravity, meterToPixel, canvas, ctx, pathCtx) {
@@ -100,8 +103,9 @@ var DoublePendulum = /** @class */ (function () {
             _this.ctx.lineTo(_this.canvas.width / 2 + x1, _this.canvas.height / 2 + y1);
             _this.ctx.lineTo(_this.canvas.width / 2 + x2, _this.canvas.height / 2 + y2);
             _this.pathCtx.lineTo(_this.canvas.width / 2 + x2, _this.canvas.height / 2 + y2);
-            var vel = Math.exp(-Math.sqrt(Math.pow((_this.previousX - x2), 2) + Math.pow((_this.previousY - y2), 2)) / (TIME_STEP * VELOCITY_SCALE));
-            _this.pathCtx.strokeStyle = "rgb(".concat(255 * (1 - vel), ",0, ").concat(255 * (vel), ")");
+            var vel = Math.exp(-Math.sqrt(Math.pow((_this.previousX - x2), 2) + Math.pow((_this.previousY - y2), 2)) /
+                (TIME_STEP * VELOCITY_SCALE * ACCURACY_MULTIPLIER));
+            _this.pathCtx.strokeStyle = "rgb(".concat(255 * (1 - vel), ",0, ").concat(255 * vel, ")");
             _this.pathCtx.stroke();
             console.log(255 * vel);
             _this.ctx.stroke();
@@ -176,8 +180,10 @@ var newValuesHandler = function () {
     var theta2 = parseFloat(t2but.value);
     var omega1 = parseFloat(o1but.value);
     var omega2 = parseFloat(o2but.value);
+    var length1 = parseFloat(l1but.value);
+    var length2 = parseFloat(l2but.value);
     console.log(theta1, theta2, omega1, omega2);
-    doublePendulum = new DoublePendulum(angleToRadians(theta1), angleToRadians(theta2), omega1, omega2, 1, 1, 1, 1, 9.81, 100, canvas, ctx, pathCtx);
+    doublePendulum = new DoublePendulum(angleToRadians(theta1), angleToRadians(theta2), omega1, omega2, 1, 1, length1, length2, 9.81, 100, canvas, ctx, pathCtx);
     console.log("New values set");
     resizeHandle(canvas);
 };
@@ -200,7 +206,12 @@ var init = function () {
     t2but = document.getElementById("theta2");
     o1but = document.getElementById("omega1");
     o2but = document.getElementById("omega2");
+    l1but = document.getElementById("length1");
+    l2but = document.getElementById("length2");
     submitBut = document.getElementById("Submit");
+    if (!t1but || !t2but || !o1but || !o2but || !submitBut) {
+        throw new Error("One of the input elements is missing");
+    }
     console.log("Done. Init complete");
     doublePendulum = new DoublePendulum(angleToRadians(60), angleToRadians(120), 1, 0, 1, 1, 1, 1, 9.81, 100, canvas, ctx, pathCtx);
     setInterval(function () {
@@ -216,7 +227,10 @@ var init = function () {
     });
 };
 var main = function (doublePendulum) {
-    doublePendulum.rungeKutta(TIME_STEP);
+    for (var i = 0; i < ACCURACY_MULTIPLIER; i++) {
+        doublePendulum.rungeKutta(TIME_STEP);
+    }
+    // doublePendulum.incrementTheta1(TIME_STEP);
     doublePendulum.displayPendulum();
 };
 window.addEventListener("DOMContentLoaded", init);

@@ -5,7 +5,8 @@
 //     height: number;
 // }
 
-const TIME_STEP = 0.05;
+const TIME_STEP = 0.0001;
+const ACCURACY_MULTIPLIER = 400;
 
 const VELOCITY_SCALE = 5e2;
 
@@ -14,11 +15,13 @@ let pathCanvas: any;
 let ctx: ctxObject;
 let pathCtx: ctxObject;
 let doublePendulum: DoublePendulum;
-let t1but: HTMLElement | null;
-let t2but: HTMLElement | null;
-let o1but: HTMLElement | null;
-let o2but: HTMLElement | null;
-let submitBut: HTMLElement | null;
+let t1but: HTMLInputElement ;
+let t2but: HTMLInputElement ;
+let o1but: HTMLInputElement ;
+let o2but: HTMLInputElement ;
+let l1but: HTMLInputElement ;
+let l2but: HTMLInputElement ;
+let submitBut: HTMLElement ;
 
 interface ctxObject {
   clearRect: (x: number, y: number, width: number, height: number) => void;
@@ -221,7 +224,7 @@ class DoublePendulum {
     );
     let vel = Math.exp(
       -Math.sqrt((this.previousX - x2) ** 2 + (this.previousY - y2) ** 2) /
-        (TIME_STEP * VELOCITY_SCALE)
+        (TIME_STEP * VELOCITY_SCALE*ACCURACY_MULTIPLIER)
     );
     this.pathCtx.strokeStyle = `rgb(${255 * (1 - vel)},0, ${255 * vel})`;
     this.pathCtx.stroke();
@@ -277,6 +280,9 @@ const newValuesHandler = (): void => {
   let theta2: number = parseFloat(t2but.value);
   let omega1: number = parseFloat(o1but.value);
   let omega2: number = parseFloat(o2but.value);
+  let length1: number = parseFloat(l1but.value);
+  let length2: number = parseFloat(l2but.value);
+  
   console.log(theta1, theta2, omega1, omega2);
   doublePendulum = new DoublePendulum(
     angleToRadians(theta1),
@@ -285,8 +291,8 @@ const newValuesHandler = (): void => {
     omega2,
     1,
     1,
-    1,
-    1,
+    length1,
+    length2,
     9.81,
     100,
     canvas,
@@ -313,11 +319,16 @@ const init = (): void => {
   pathCanvas.style.width = window.innerWidth + "px";
   pathCanvas.style.height = window.innerHeight + "px";
 
-  t1but = document.getElementById("theta1");
-  t2but = document.getElementById("theta2");
-  o1but = document.getElementById("omega1");
-  o2but = document.getElementById("omega2");
-  submitBut = document.getElementById("Submit");
+  t1but = document.getElementById("theta1") as HTMLInputElement;
+  t2but = document.getElementById("theta2") as HTMLInputElement;
+  o1but = document.getElementById("omega1") as HTMLInputElement;
+  o2but = document.getElementById("omega2") as HTMLInputElement;
+  l1but = document.getElementById("length1") as HTMLInputElement;
+  l2but = document.getElementById("length2") as HTMLInputElement;
+  submitBut = document.getElementById("Submit") as HTMLElement;
+  if(!t1but || !t2but || !o1but || !o2but || !submitBut){
+    throw new Error("One of the input elements is missing");
+  }
 
   console.log("Done. Init complete");
   doublePendulum = new DoublePendulum(
@@ -350,7 +361,11 @@ const init = (): void => {
 };
 
 const main = (doublePendulum: DoublePendulum): void => {
+  for (let i = 0; i < ACCURACY_MULTIPLIER; i++){
   doublePendulum.rungeKutta(TIME_STEP);
+  }
+  
+  // doublePendulum.incrementTheta1(TIME_STEP);
   doublePendulum.displayPendulum();
 };
 
