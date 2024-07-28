@@ -21,6 +21,8 @@ let o1but: HTMLInputElement ;
 let o2but: HTMLInputElement ;
 let l1but: HTMLInputElement ;
 let l2but: HTMLInputElement ;
+let m1but: HTMLInputElement ;
+let m2but: HTMLInputElement ;
 let submitBut: HTMLElement ;
 
 interface ctxObject {
@@ -282,6 +284,8 @@ const newValuesHandler = (): void => {
   let omega2: number = parseFloat(o2but.value);
   let length1: number = parseFloat(l1but.value);
   let length2: number = parseFloat(l2but.value);
+  let mass1: number = parseFloat(m1but.value);
+  let mass2: number = parseFloat(m2but.value);
   
   console.log(theta1, theta2, omega1, omega2);
   doublePendulum = new DoublePendulum(
@@ -289,8 +293,8 @@ const newValuesHandler = (): void => {
     angleToRadians(theta2),
     omega1,
     omega2,
-    1,
-    1,
+    mass1,
+    mass2,
     length1,
     length2,
     9.81,
@@ -325,8 +329,10 @@ const init = (): void => {
   o2but = document.getElementById("omega2") as HTMLInputElement;
   l1but = document.getElementById("length1") as HTMLInputElement;
   l2but = document.getElementById("length2") as HTMLInputElement;
+  m1but = document.getElementById("mass1") as HTMLInputElement;
+  m2but = document.getElementById("mass2") as HTMLInputElement
   submitBut = document.getElementById("Submit") as HTMLElement;
-  if(!t1but || !t2but || !o1but || !o2but || !submitBut){
+  if(!t1but || !t2but || !o1but || !o2but || !submitBut || !l1but || !l2but || !m1but || !m2but){
     throw new Error("One of the input elements is missing");
   }
 
@@ -338,7 +344,7 @@ const init = (): void => {
     0,
     1,
     1,
-    1,
+    1.5,
     1,
     9.81,
     100,
